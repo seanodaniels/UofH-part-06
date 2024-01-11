@@ -34,7 +34,7 @@ const AnecdoteForm = () => {
     } else {      
       notificationDispatch({
         type: 'notification',
-        payload: `anecdote needs to be at least 5 characters long.` 
+        payload: `Anecdote needs to be at least 5 characters long.` 
       })
     }
   }
