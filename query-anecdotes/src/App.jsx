@@ -1,32 +1,18 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
-import axios from 'axios'
-import { updateAnecdote } from './requests'
-
+import { useReducer } from 'react'
 import { getAnecdotes } from './requests'
+import { NotificationContextProvider } from './NotificationContext'
 
 import AnecdoteForm from './components/AnecdoteForm'
+import AnecdoteItem from './components/AnecdoteItem'
 import Notification from './components/Notification'
 
+const notificationReducer = (state, action) => {
+  return action.payload
+}  
+
 const App = () => {
-
-  const queryClient = useQueryClient()
-
-  const voteAnecdoteMutation = useMutation({
-    mutationFn: updateAnecdote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['anecdotes']
-      })
-    }
-  })
-
-  const handleVote = (anecdote) => {
-    voteAnecdoteMutation.mutate({
-      ...anecdote,
-      votes: anecdote.votes + 1
-    })
-    console.log('vote')
-  }
+  const [notificationMessage, dispatch] = useReducer(notificationReducer, 'App is Ready.')
 
   const result = useQuery({
     queryKey: ['anecdotes'],
@@ -46,24 +32,23 @@ const App = () => {
   const anecdotes = result.data
 
   return (
-    <div>
-      <h3>Anecdote app</h3>
-    
-      <Notification />
-      <AnecdoteForm />
-    
-      {anecdotes.map(anecdote =>
-        <div key={anecdote.id}>
-          <div>
-            {anecdote.content}
+    <NotificationContextProvider>
+      <div>
+        <h3>Anecdote app</h3>
+      
+        <Notification />
+        <AnecdoteForm />
+      
+        {anecdotes.map(anecdote =>
+          <div key={anecdote.id}>
+            <AnecdoteItem 
+              key={anecdote.id} 
+              anecdote={anecdote}  
+            />
           </div>
-          <div>
-            has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </NotificationContextProvider>
   )
 }
 
